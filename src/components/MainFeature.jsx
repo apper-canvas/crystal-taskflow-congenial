@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { format } from 'date-fns';
-import { getIcon } from '../utils/iconUtils';
-
-export default function MainFeature({ onTaskAction, updateStats }) {
-  // Task states
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem('tasks');
-    return savedTasks ? JSON.parse(savedTasks) : [];
-  });
-  
-  const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
+LineNumber:644:// Get color class for status text or icons
+LineNumber:655:// Get style class for checkbox/status icon in list view
+LineNumber:663:// Get icon component for status in list view pill
+LineNumber:684:// Get a colored dot element for status in Kanban view
+LineNumber:707:// Icon components used in MainFeature
+LineNumber:582:      {/* Status indicators/changers */}
+LineNumber:583:      <div className="mt-3 pt-2 border-t border-surface-100 dark:border-surface-700 flex items-center gap-1.5">
+LineNumber:584:        <span className="text-xs text-surface-600 dark:text-surface-400">Status:</span>
+LineNumber:585:        {['not-started', 'in-progress', 'on-hold', 'completed'].map((statusOption) => (
+LineNumber:586:          <button
+LineNumber:587:            key={statusOption}
+LineNumber:588:            onClick={() => onChangeStatus(task.id, statusOption)}
+LineNumber:589:            className={`p-1 rounded-full flex items-center justify-center 
+LineNumber:590:              ${task.status === statusOption ? 'bg-surface-200 dark:bg-surface-700' : 'hover:bg-surface-100 dark:hover:bg-surface-800'} 
+LineNumber:591:              ${statusOption === 'completed' && task.status === 'completed' ? 'ring-1 ring-green-500' : ''} // Optional ring for completed status
+LineNumber:592:            `}
+LineNumber:593:            title={formatStatus(statusOption)}
+LineNumber:594:            aria-label={`Set status to ${formatStatus(statusOption)}`}
+LineNumber:595:          >
+LineNumber:596:            {getStatusDot(statusOption)}
+LineNumber:597:          </button>
+LineNumber:598:        ))}
+LineNumber:599:      </div> {/* End Status Indicators */}
     priority: 'medium',
     dueDate: format(new Date(Date.now() + 86400000), 'yyyy-MM-dd'), // Tomorrow
+LineNumber:534:// Component for displaying tasks in Kanban columns
     status: 'not-started'
   });
   
   const [editingTask, setEditingTask] = useState(null);
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('dueDate');
-  const [view, setView] = useState('list'); // 'list' or 'kanban'
+  const [view, setView] = useState('list'); // 'list', 'kanban', 'calendar' (future)
   
   // Store tasks in localStorage whenever they change
   useEffect(() => {
@@ -154,7 +164,8 @@ export default function MainFeature({ onTaskAction, updateStats }) {
       default:
         // Default to sorting by created date
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
+    // Use filtered and sorted tasks for the Kanban view data
+    const columns = { 
     
     return filtered;
   };
@@ -179,7 +190,7 @@ export default function MainFeature({ onTaskAction, updateStats }) {
         icon: 'pause',
         tasks: []
       },
-      'completed': {
+    getFilteredTasks().forEach(task => { // Use filteredTasks
         title: 'Completed',
         icon: 'check-circle',
         tasks: []
@@ -362,7 +373,7 @@ export default function MainFeature({ onTaskAction, updateStats }) {
             onClick={() => setView('kanban')}
             className={`px-3 py-1.5 rounded-md flex items-center ${
               view === 'kanban' 
-                ? 'bg-white dark:bg-surface-700 shadow-sm' 
+LineNumber:373:        </div> {/* End View Toggle */}
                 : 'text-surface-600 dark:text-surface-400'
             }`}
           >
